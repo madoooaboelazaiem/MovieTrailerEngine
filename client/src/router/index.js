@@ -58,12 +58,6 @@ const routes = [
     props: true,
     component: () => import("../views/User/ResetPassword.vue"),
   },
-  {
-    path: "/testing",
-    name: "Testing",
-    props: true,
-    component: () => import("../views/Testing.vue"),
-  },
 ]
 
 const router = new VueRouter({

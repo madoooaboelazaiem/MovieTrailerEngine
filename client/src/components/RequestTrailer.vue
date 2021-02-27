@@ -91,14 +91,7 @@ export default {
     return {
       name: "",
       description: "",
-      price: "",
-      stock: "",
-      category: null,
-      brand: null,
-      model: null,
-      imageInputs: [{ distinctNumber: 0 }],
-      imageLinks: [{ distinctNumber: 10, link: "" }],
-      distinctNumberGenerator: 1,
+      year: "",
       value: false,
       dataEraser: false,
     }
@@ -109,14 +102,7 @@ export default {
         !this.name ||
         this.name.length == 0 ||
         !this.description ||
-        this.description.length == 0 ||
-        !this.price ||
-        this.price.length == 0 ||
-        !this.stock ||
-        this.stock.length == 0 ||
-        !this.category ||
-        !this.brand ||
-        !this.model
+        this.description.length == 0
       ) {
         this.$q.notify({
           type: "negative",
@@ -131,36 +117,10 @@ export default {
           this.description && this.description.length > 0
             ? this.description
             : null,
-        price: this.price && this.price.length > 0 ? this.price : null,
-        stock: this.stock && this.stock.length > 0 ? this.stock : null,
-        category_id:
-          this.category && this.category.name ? this.category.id : null,
-        brand_id: this.brand && this.brand.name ? this.brand.id : null,
-        model_id: this.model && this.model.name ? this.model.id : null,
       }
-      var images = []
-      this.imageInputs.forEach((obj) => {
-        if (obj.image_url && obj.image_url.length > 0) {
-          images.push(obj.image_url)
-        }
-        // console.log(JSON.parse(JSON.stringify(obj)));
-      })
-      this.imageLinks.forEach((obj) => {
-        if (obj.link && obj.link.length > 0) {
-          images.push(obj.link)
-        }
-      })
-      apiObject.images = images
-      if (images.length == 0) {
-        this.$q.notify({
-          type: "negative",
-          message: "Product images are missing",
-          timeout: 2000,
-        })
-        return
-      }
+
       await api()
-        .post(`products/createProduct`, apiObject)
+        .post(`requests/`, apiObject)
         .then((res) => {
           if (res.data.status && res.data.status == "success") {
             this.$q.notify({
@@ -184,15 +144,7 @@ export default {
     clearAllData() {
       this.name = ""
       this.description = ""
-      this.price = ""
-      this.stock = ""
-      this.category = null
-      this.brand = null
-      this.model = null
-      this.imageInputs = [{ distinctNumber: this.distinctNumberGenerator++ }]
-      this.imageLinks = [
-        { distinctNumber: this.distinctNumberGenerator++, link: "" },
-      ]
+      this.year = ""
       this.dataEraser = true
       setTimeout(() => {
         this.dataEraser = false
@@ -210,17 +162,7 @@ export default {
     //   }
     // }
   },
-  computed: {
-    availableCategories() {
-      return this.$store.getters.getCategories
-    },
-    availableBrands() {
-      return this.$store.getters.getBrands
-    },
-    availableModels() {
-      return this.$store.getters.getModels
-    },
-  },
+  computed: {},
   created() {
     window.scrollTo(0, 0)
   },

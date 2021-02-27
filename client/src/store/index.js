@@ -18,6 +18,7 @@ export default new Vuex.Store({
     token: null,
     movies: [],
     trending: [],
+    selectedMovie: {},
   },
   getters: {
     getUserId(state) {
@@ -35,6 +36,9 @@ export default new Vuex.Store({
     getTrending(state) {
       return state.trending
     },
+    getSelectedMovie(state) {
+      return state.selectedMovie
+    },
   },
   mutations: {
     setUserId(state, value) {
@@ -43,6 +47,9 @@ export default new Vuex.Store({
     setUserType(state, value) {
       state.type = value
     },
+    setSelectedMovie(state, value) {
+      state.selectedMovie = value
+    },
     setToken(state, value) {
       state.token = value
     },
@@ -50,7 +57,6 @@ export default new Vuex.Store({
       state.user_id = null
       state.token = null
       state.type = null
-      state.cart = []
     },
     setMovies(state, value) {
       state.movies = value
@@ -62,9 +68,7 @@ export default new Vuex.Store({
   actions: {
     async fetchMoviesTMDB(context) {
       await axios
-        .get(
-          "https://api.themoviedb.org/3/trending/movie/day?api_key=c33cf64a576bb3748c44f3f18deedcf1"
-        )
+        .get(process.env.VUE_APP_tmdb_URI)
         .then((res) => {
           console.log(res)
           if (res.status == 200) {

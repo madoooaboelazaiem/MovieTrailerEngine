@@ -46,7 +46,7 @@
                       <q-btn
                         class="bg-indigo-6 text-white q-mx-sm"
                         v-if="$q.screen.gt.sm"
-                        @click="viewMoreClicked(movie)"
+                        @click="viewTrailerClicked(movie)"
                         >Trailer</q-btn
                       >
                       <q-btn
@@ -54,11 +54,11 @@
                         class="bg-indigo-6 text-white q-mx-xs"
                         icon="movie"
                         v-else
-                        @click="viewMoreClicked(movie)"
+                        @click="viewTrailerClicked(movie)"
                       ></q-btn>
                       <q-btn
                         class="bg-green-7 text-white"
-                        @click="addToCartClicked(movie)"
+                        @click="shareClicked(movie)"
                         v-if="$q.screen.gt.sm"
                         >Share</q-btn
                       >
@@ -67,15 +67,15 @@
                         class="bg-green-7 text-white"
                         icon="share"
                         v-else
-                        @click="addToCartClicked(movie)"
+                        @click="shareClicked(movie)"
                       ></q-btn>
                       <q-btn
                         v-model="movie.favourite"
                         round
                         class="bg-white"
-                        :class="!movie.favourite ? 'text-orange' : ''"
+                        :class="movie.favourite ? 'text-orange' : ''"
                         icon="grade"
-                        @click="addAndRemoveFromFavourites()"
+                        @click="addAndRemoveFromFavourites(movie)"
                       ></q-btn>
                     </q-card-actions>
                   </div>
@@ -98,7 +98,7 @@ export default {
     return {
       movies: [],
       animation: false,
-      showmovieCard: false,
+      showMovieTrailer: false,
       selectedmovie: {},
       slide: 1,
       ratingModel: 0,
@@ -137,43 +137,33 @@ export default {
       // this.$q.loadingBar.increment(50);
     },
     async addAndRemoveFromFavourites() {
-      // if (value == 2) {
-      //   await this.$store
-      //     .dispatch("removeFromFavourites", this.selectedmovie.id)
-      //     .then(async (res) => {
-      //       this.$q.notify({
-      //         type:
-      //           res.status && res.status == "success" ? "positive" : "negative",
-      //         message: res.message ? res.message : "Error Occured",
-      //         timeout: 2000,
-      //       })
-      //       if (res.status == "success") {
-      //         await this.getData()
-      //       }
-      //     })
-      // }
-      // if (value == 1) {
-      //   var token = this.$store.getters.getToken
-      //   if (!token) {
-      //     this.$q.notify({
-      //       type: "warning",
-      //       message: "Please login or register to add movie to favourites",
-      //       timeout: 5000,
-      //     })
-      //     // setTimeout(() => {
-      //     //   this.$router.push({ name: "Login" });
-      //     // }, 1000);
-      //   } else {
-      //     this.showmovieCardM = true
-      //     movieObject.toFavourites = true
-      //     this.selectedmovie = movieObject
-      //   }
-      // }
-      // this.showDeleteDialog = false
+      await this.$store
+        .dispatch("editFavourites", this.selectedmovie.id)
+        .then(async (res) => {
+          this.$q.notify({
+            type:
+              res.status && res.status == "success" ? "positive" : "negative",
+            message: res.message ? res.message : "Error Occured",
+            timeout: 2000,
+          })
+          if (res.status == "success") {
+            await this.getData()
+          }
+        })
     },
-    viewMoreClicked(value) {
+    viewTrailerClicked(value) {
+      this.showMovieTrailer = true
+      this.selectedmovie = value
+      // this.$store.commit("setSelectedmovie", value)
+      // this.$router.push({ name: "ViewTrailer" })
+    },
+    shareClicked(value) {
+      // this.showMovieTrailer = true
+      // this.selectedmovie = value
       this.$store.commit("setSelectedmovie", value)
-      this.$router.push({ name: "ViewTrailer" })
+      window.location.href =
+        "https://www.facebook.com/sharer/sharer.php?u=" +
+        "https://www.youtube.com/watch?v=CFGjn3yKMNc"
     },
   },
   created() {
