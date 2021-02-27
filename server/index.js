@@ -12,15 +12,9 @@ Model.knex(knex)
 
 const app = express()
 
-const category = require("./routes/categories")
-const admin = require("./routes/admins")
 const session = require("./routes/sessions")
-const customer = require("./routes/customers")
-const model = require("./routes/models")
-const brand = require("./routes/brands")
-const product = require("./routes/products")
-const order = require("./routes/orders")
-const product_image = require("./routes/product_images")
+const users = require("./routes/users")
+const movies = require("./routes/movies")
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
@@ -30,17 +24,11 @@ app.get("/", (req, res) => {
   res.send(`<h1>CouchPotato Welcomes You </h1>`)
 })
 
-app.use("/api/categories", category)
-app.use("/api/admins", admin)
 app.use("/api/sessions", session)
-app.use("/api/customers", customer)
-app.use("/api/models", model)
-app.use("/api/brands", brand)
-app.use("/api/products", product)
-app.use("/api/orders", order)
-app.use("/api/product_images", product_image)
+app.use("/api/movies", movies)
+app.use("/api/users", users)
 
-const port = process.env.PORT
+const port = process.env.port
 app.listen(port, (req, res) => {
   console.log(`Server up and running on port ${port}`)
 })

@@ -1,9 +1,8 @@
-const express = require('express');
-const router = express.Router();
-const session = require('../controllers/sessions');
+const express = require("express")
+const router = express.Router()
+const session = require("../controllers/sessions")
 
-router.post('/login', session.Login);
-router.post('/requestPasswordReset', session.requestPasswordReset);
-router.post('/resetPassword/:token', session.resetPassword);
+router.post("/login", session.Login)
+router.post("/resetPassword", session.resetPassword)
 
-module.exports = router;
+module.exports = router
