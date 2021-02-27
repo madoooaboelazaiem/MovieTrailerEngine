@@ -20,21 +20,21 @@ export default {
   name: "SearchField",
   data() {
     return {
-      searchValue: ""
-    };
+      searchValue: "",
+    }
   },
   props: {
     labelName: {
       type: String,
-      required: false
+      required: false,
     },
     items: {
       type: Array,
       required: false,
-      default: () => []
-    }
-  }
-};
+      default: () => [],
+    },
+  },
+}
 </script>
 
 <style lang="scss" scoped>

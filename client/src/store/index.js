@@ -1,7 +1,9 @@
 import Vue from "vue"
 import Vuex from "vuex"
 import VuexPersistence from "vuex-persist"
+import axios from "axios"
 import api from "./api"
+require("dotenv").config()
 Vue.use(Vuex)
 
 const vuexLocal = new VuexPersistence({
@@ -14,13 +16,8 @@ export default new Vuex.Store({
     user_id: null,
     type: null,
     token: null,
-    products: [],
-    models: [],
-    brands: [],
-    categories: [],
-    cart: [],
-    selectedProduct: {},
-    customerName: "",
+    movies: [],
+    trending: [],
   },
   getters: {
     getUserId(state) {
@@ -32,26 +29,11 @@ export default new Vuex.Store({
     getToken(state) {
       return state.token
     },
-    getProducts(state) {
-      return state.products
+    getMovies(state) {
+      return state.movies
     },
-    getBrands(state) {
-      return state.brands
-    },
-    getModels(state) {
-      return state.models
-    },
-    getCategories(state) {
-      return state.categories
-    },
-    getCart(state) {
-      return state.cart
-    },
-    getSelectedProduct(state) {
-      return state.selectedProduct
-    },
-    getCustomerName(state) {
-      return state.customerName
+    getTrending(state) {
+      return state.trending
     },
   },
   mutations: {
@@ -70,203 +52,37 @@ export default new Vuex.Store({
       state.type = null
       state.cart = []
     },
-    setProducts(state, value) {
-      state.products = value
+    setMovies(state, value) {
+      state.movies = value
     },
-    setBrands(state, value) {
-      state.brands = value
-    },
-    setCategories(state, value) {
-      state.categories = value
-    },
-    setModels(state, value) {
-      state.models = value
-    },
-    addToCart(state, obj) {
-      state.cart.push(obj)
-    },
-    removeFromCart(state, index) {
-      state.cart.splice(index, 1)
-    },
-    clearCart(state) {
-      state.cart = []
-    },
-    setSelectedProduct(state, value) {
-      state.selectedProduct = value
-    },
-    setName(state, value) {
-      state.customerName = value
+    setTrending(state, value) {
+      state.trending = value
     },
   },
   actions: {
-    async fetchProducts(context) {
-      await api()
-        .get(`products/getallProducts`)
+    async fetchMoviesTMDB(context) {
+      await axios
+        .get(
+          "https://api.themoviedb.org/3/trending/movie/day?api_key=c33cf64a576bb3748c44f3f18deedcf1"
+        )
         .then((res) => {
-          if (res.data.status == "success") {
-            context.commit("setProducts", res.data.data)
+          console.log(res)
+          if (res.status == 200) {
+            context.commit("setTrending", res.data.results)
           }
         })
         .catch((err) => console.log(err))
     },
-    async fetchCategories(context) {
+    async fetchMovies(context) {
       await api()
-        .get(`categories/getCategories`)
+        .get(`movies/`)
         .then((res) => {
           if (res.data.status == "success") {
             var data = res.data.data
-            data = data.sort((a, b) => {
-              if (a.name < b.name) {
-                return -1
-              }
-              if (a.name > b.firstname) {
-                return 1
-              }
-              return 0
-            })
-            context.commit("setCategories", data)
+            context.commit("setMovies", data)
           }
         })
         .catch((err) => console.log(err))
-    },
-    async fetchBrands(context) {
-      await api()
-        .get(`brands/getBrands`)
-        .then((res) => {
-          if (res.data.status == "success") {
-            var data = res.data.data
-            data = data.sort((a, b) => {
-              if (a.name < b.name) {
-                return -1
-              }
-              if (a.name > b.firstname) {
-                return 1
-              }
-              return 0
-            })
-            context.commit("setBrands", data)
-          }
-        })
-        .catch((err) => console.log(err))
-    },
-    async fetchModels(context) {
-      await api()
-        .get(`models/getModels`)
-        .then((res) => {
-          if (res.data.status == "success") {
-            var data = res.data.data
-            data = data.sort((a, b) => {
-              if (a.name < b.name) {
-                return -1
-              }
-              if (a.name > b.firstname) {
-                return 1
-              }
-              return 0
-            })
-            context.commit("setModels", data)
-          }
-        })
-        .catch((err) => console.log(err))
-    },
-    async createOrder(context) {
-      const cart = { products: context.getters.getCart }
-      return api()
-        .post("orders/createOrder", cart)
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async payOrder(context, order_object) {
-      const orderId = order_object.order_id
-      const token = order_object.paymentToken
-      console.log("order_object", order_object)
-      console.log("orderId", orderId)
-      return api()
-        .put(`orders/payOrder/${orderId}`, {
-          paymentToken: token,
-        })
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async cancelOrder(context, orderId) {
-      return api()
-        .put(`orders/cancelOrder/${orderId}`)
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async getCustomerProfile() {
-      return api()
-        .get(`customers/viewProfile`)
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async deactivateProfile(context) {
-      var user_id = context.getters.getUserId
-      return api()
-        .delete(`customers/deactivateProfile/${user_id}`)
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async editProfile(context, apiObject) {
-      return api()
-        .put(`customers/editProfile`, apiObject)
-        .then((res) => {
-          if (res.data.status == "success") {
-            return res.data
-          }
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async deleteProduct(context, product_id) {
-      return api()
-        .delete(`products/deleteProduct/${product_id}`)
-        .then((res) => {
-          return res.data
-        })
-        .catch((err) => {
-          return err.response.data
-        })
-    },
-    async fetchCurrentProduct(context, product_id) {
-      await api()
-        .get(`products/getSingleProduct/${product_id}`)
-        .then((res) => {
-          if (res.data.status && res.data.status == "success") {
-            context.commit("setSelectedProduct", res.data.product)
-          }
-        })
     },
   },
   plugins: [vuexLocal.plugin],

@@ -1,11 +1,13 @@
 import axios from "axios"
 import { Loading } from "quasar"
 import store from "./index"
+require("dotenv").config()
+
 // default options
 // import store from "./index";
 export default () => {
   var apiObject = axios.create({
-    baseURL: "http://localhost:3001/api",
+    baseURL: process.env.VUE_APP_API_URL,
     headers: {
       // eslint-disable-next-line no-undef
       Authorization: store.getters.getToken,

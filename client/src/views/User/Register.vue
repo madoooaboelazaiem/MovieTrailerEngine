@@ -190,7 +190,7 @@ export default {
             }
 
             setTimeout(() => {
-              this.$router.push({ name: "Products" })
+              this.$router.push({ name: "Default" })
             }, 3000)
           })
           .catch((err) => {

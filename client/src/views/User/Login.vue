@@ -102,10 +102,9 @@ export default {
             this.$store.commit("setUserId", response.id)
             this.$store.commit("setUserType", response.type)
             this.$store.commit("setToken", response.token)
-            if (response.name) this.$store.commit("setName", response.name)
             this.showLeaveAnimation = true
             setTimeout(() => {
-              this.$router.push({ name: "Products" })
+              this.$router.push({ name: "Default" })
             }, 1500)
           })
           .catch((err) => {

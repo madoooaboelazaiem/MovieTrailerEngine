@@ -24,6 +24,91 @@
           </q-input>
         </div>
       </div>
+      <div
+        v-if="outputMovies && outputMovies.length > 0"
+        class="row justify-evenly"
+      >
+        <q-card
+          class="col-xs-12 col-md-3 q-my-md"
+          :class="{
+            'q-ml-sm': $q.screen.gt.sm,
+            'animated swing': animation,
+          }"
+          v-for="(movie, index) in outputMovies"
+          :key="index"
+        >
+          <div class="column justify-between" style="height:100%;">
+            <div class="col-shrink">
+              <q-img
+                :src="movie.fanart"
+                :ratio="16 / 9"
+                placeholder-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
+                spinner-color="white"
+                style="height: 300px; max-width:100%"
+              />
+              <q-card-section>
+                <div class="row justify-between">
+                  <div class="col-shrink text-subtitle1 text-weight-bold">
+                    {{ movie.original_title }}
+                  </div>
+                  <div class="col-shrink text-subtitle1">
+                    {{ movie.vote_average }}
+                  </div>
+                </div>
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                {{ movie.name }}
+              </q-card-section>
+              <q-card-section class="q-pt-none">
+                {{ movie.overview }}
+              </q-card-section>
+            </div>
+            <div class="col-shrink">
+              <q-card-actions class="row justify-center">
+                <q-btn
+                  class="bg-indigo-6 text-white q-mx-sm"
+                  v-if="$q.screen.gt.sm"
+                  @click="viewMoreClicked(movie)"
+                  >Trailer</q-btn
+                >
+                <q-btn
+                  round
+                  class="bg-indigo-6 text-white q-mx-xs"
+                  icon="movie"
+                  v-else
+                  @click="viewMoreClicked(movie)"
+                ></q-btn>
+                <q-btn
+                  class="bg-green-7 text-white"
+                  @click="addToCartClicked(movie)"
+                  v-if="$q.screen.gt.sm"
+                  >Share</q-btn
+                >
+                <q-btn
+                  round
+                  class="bg-green-7 text-white"
+                  icon="share"
+                  v-else
+                  @click="addToCartClicked(movie)"
+                ></q-btn>
+                <!-- <div class="q-pa-md">
+                  <q-rating
+                    v-model="ratingModel"
+                    size="2em"
+                    :max="1"
+                    color="warning"
+                    @click="addAndRemoveFromFavourites()"
+                  >
+                  </q-rating>
+                </div> -->
+              </q-card-actions>
+            </div>
+          </div>
+        </q-card>
+      </div>
+      <div v-else>
+        <div class="row justify-center text-white">Button</div>
+      </div>
     </div>
     <div class="col-12" v-if="$q.platform.is.mobile">
       <div class="row justify-end">
@@ -36,25 +121,25 @@
         ></q-btn>
       </div>
     </div>
-    <q-dialog v-model="showProductCard">
+    <q-dialog v-model="showMovieCard">
       <q-card style="width:80vw">
         <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Product:</div>
+          <div class="text-h6">Movie:</div>
           <q-space />
           <q-btn icon="close" flat round dense v-close-popup />
         </q-card-section>
 
-        <q-card-section v-if="showProductCard">
+        <q-card-section v-if="showMovieCard">
           <div class="row jusitify-between">
             <div class="col">
               <div class="column">
-                <div class="col">Name : {{ selectedProduct.name }}</div>
+                <div class="col">Name : {{ selectedMovie.name }}</div>
                 <div class="col">
-                  Category: {{ selectedProduct.Category.name }}
+                  Category: {{ selectedMovie.Category.name }}
                 </div>
-                <div class="col">Brand: {{ selectedProduct.Brand.name }}</div>
-                <div class="col">Model: {{ selectedProduct.Model.name }}</div>
-                <div class="col">Price: {{ selectedProduct.price }} EGP</div>
+                <div class="col">Brand: {{ selectedMovie.Brand.name }}</div>
+                <div class="col">Model: {{ selectedMovie.Model.name }}</div>
+                <div class="col">Price: {{ selectedMovie.price }} EGP</div>
               </div>
             </div>
             <div class="col-shrink ">
@@ -66,13 +151,13 @@
                     class="bg-red-8 text-white"
                     size="md"
                     icon="remove"
-                    :disable="selectedProduct.countOfProducts == 1"
-                    @click="decrementProductCount"
+                    :disable="selectedMovie.countOfMovies == 1"
+                    @click="decrementMovieCount"
                   />
                 </div>
                 <div class="col-shrink">
                   <div class="text-h6 q-px-sm">
-                    {{ selectedProduct.countOfProducts }}
+                    {{ selectedMovie.countOfMovies }}
                   </div>
                 </div>
                 <div class="col">
@@ -82,13 +167,13 @@
                     class="bg-green-14 text-white"
                     size="md"
                     icon="add"
-                    @click="incrementProductCount"
+                    @click="incrementMovieCount"
                     :disable="
-                      selectedProduct.stock <= selectedProduct.countOfProducts
+                      selectedMovie.stock <= selectedMovie.countOfMovies
                     "
                     :title="
-                      selectedProduct.stock <= selectedProduct.countOfProducts
-                        ? 'There are no more available products'
+                      selectedMovie.stock <= selectedMovie.countOfMovies
+                        ? 'There are no more available Movies'
                         : ''
                     "
                   />
@@ -102,7 +187,7 @@
           >
             <div class="col-auto">
               Total Price:
-              {{ selectedProduct.price * selectedProduct.countOfProducts }}
+              {{ selectedMovie.price * selectedMovie.countOfMovies }}
               EGP
             </div>
             <q-space />
@@ -124,7 +209,7 @@
       <q-card>
         <q-card-section class="row items-center">
           <span class="q-ml-sm"
-            >Are you sure you want to delete this product?</span
+            >Are you sure you want to delete this Movie?</span
           >
         </q-card-section>
 
@@ -156,7 +241,7 @@ export default {
   components: {},
   data() {
     return {
-      databaseProducts: [],
+      databaseMovies: [],
       searchText: "",
       animation: false,
       intervalMin: 0,
@@ -165,13 +250,13 @@ export default {
         min: 0,
         max: 0,
       },
-      tempProducts: [],
+      tempMovies: [],
       currentFilters: [],
       clearData: false,
       showFiltersCard: true,
-      showProductCard: false,
+      showMovieCard: false,
       showDeleteDialog: false,
-      selectedProduct: { name: "" },
+      selectedMovie: { name: "" },
       brandsContainer: {},
       categoriesContainer: {},
       // modelsContainer: [],
@@ -187,38 +272,38 @@ export default {
   },
   methods: {
     async pageCreated() {
-      await this.$store.dispatch("fetchProducts")
-      var allProducts = this.$store.getters.getProducts
+      await this.$store.dispatch("fetchMoviesTMDB")
+      var allMovies = this.$store.getters.getMovies
       var currentCar = this.$store.getters.getCart
       var tempCategories = []
       var tempBrands = []
       var tempModels = []
       var maxPrice = 0
       var data = []
-      allProducts.forEach((product) => {
+      allMovies.forEach((Movie) => {
         currentCar.forEach((cartObj) => {
-          if (cartObj.product && cartObj.product.id == product.id) {
-            product.stock -= cartObj.count
+          if (cartObj.Movie && cartObj.Movie.id == Movie.id) {
+            Movie.stock -= cartObj.count
           }
         })
-        if (product.price > maxPrice) {
-          maxPrice = product.price
+        if (Movie.price > maxPrice) {
+          maxPrice = Movie.price
         }
         data.push({
-          Category: product.Category,
-          Brand: product.Brand,
-          Model: product.Model,
+          Category: Movie.Category,
+          Brand: Movie.Brand,
+          Model: Movie.Model,
         })
-        if (this.brandsContainer[product.Brand.name])
-          this.brandsContainer[product.Brand.name].push(product.Model)
-        else this.brandsContainer[product.Brand.name] = [product.Model]
-        if (this.categoriesContainer[product.Category.name])
-          this.categoriesContainer[product.Category.name].push(product.Brand)
-        else this.categoriesContainer[product.Category.name] = [product.Brand]
+        if (this.brandsContainer[Movie.Brand.name])
+          this.brandsContainer[Movie.Brand.name].push(Movie.Model)
+        else this.brandsContainer[Movie.Brand.name] = [Movie.Model]
+        if (this.categoriesContainer[Movie.Category.name])
+          this.categoriesContainer[Movie.Category.name].push(Movie.Brand)
+        else this.categoriesContainer[Movie.Category.name] = [Movie.Brand]
 
-        tempModels.push(product.Model)
-        tempCategories.push(product.Category)
-        tempBrands.push(product.Brand)
+        tempModels.push(Movie.Model)
+        tempCategories.push(Movie.Category)
+        tempBrands.push(Movie.Brand)
       })
       this.rawOrder = data
       Object.keys(this.categoriesContainer).forEach((key) => {
@@ -244,11 +329,11 @@ export default {
         this.brandsContainer[key] = currentArray
       })
 
-      allProducts = allProducts.filter((product) => product.stock > 0)
+      allMovies = allMovies.filter((Movie) => Movie.stock > 0)
       this.intervalMax = maxPrice
       this.priceRange.max = maxPrice
-      this.databaseProducts = allProducts
-      this.tempProducts = allProducts
+      this.databaseMovies = allMovies
+      this.tempMovies = allMovies
       tempCategories = Object.values(
         tempCategories.reduce(
           (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
@@ -276,41 +361,10 @@ export default {
     },
 
     async getData() {
-      await Promise.all([
-        this.$store.dispatch("fetchProducts"),
-        this.$store.dispatch("fetchCategories"),
-        this.$store.dispatch("fetchBrands"),
-        this.$store.dispatch("fetchModels"),
-      ])
+      await Promise.all([this.$store.dispatch("fetchMoviesTMDB")])
 
-      var data = this.$store.getters.getProducts
-      var currentCart = this.$store.getters.getCart
-      if (currentCart.length > 0) {
-        currentCart.forEach((item) => {
-          data.forEach((product) => {
-            if (product.id == item.product.id) {
-              product.stock -= item.count
-            }
-          })
-        })
-      }
-      data = data.filter((product) => product.stock > 0)
-      this.products = data
-      var modelsHolder = {}
-      var brandsHolder = {}
-      var categoriesHolder = {}
-      var brandsUbmrella = []
-      data.forEach((product) => {
-        if (!categoriesHolder[product.Category.name])
-          categoriesHolder[product.Category.name] = {}
-        if (!brandsHolder[product.Brand.name])
-          brandsHolder[product.Brand.name] = {}
-        if (!modelsHolder[product.Model.name])
-          modelsHolder[product.Model.name] = {}
-        if (brandsUbmrella[product.brand_id])
-          brandsUbmrella[product.brand_id].push(product.Model)
-        else brandsUbmrella[product.brand_id] = [product.Model]
-      })
+      var data = JSON.parse(JSON.stringify(this.$store.getters.getTrending))
+      this.tempMovies = data
       // console.log(categoriesHolder);
       // console.log(brandsHolder);
       // console.log(brandsUbmrella);
@@ -329,76 +383,43 @@ export default {
       // this.$q.loadingBar.stop();
       // this.$q.loadingBar.increment(50);
     },
-    addToCartClicked(productObject) {
+    addToCartClicked(MovieObject) {
       var token = this.$store.getters.getToken
       if (!token) {
         this.$q.notify({
           type: "warning",
-          message: "Please login or register to add products to your cart",
+          message: "Please login or register to add Movies to your cart",
           timeout: 5000,
         })
         // setTimeout(() => {
         //   this.$router.push({ name: "Login" });
         // }, 1000);
       } else {
-        this.showProductCard = true
-        productObject.countOfProducts = 1
-        this.selectedProduct = productObject
+        this.showMovieCard = true
+        MovieObject.countOfMovies = 1
+        this.selectedMovie = MovieObject
       }
     },
-    decrementProductCount() {
-      this.selectedProduct.countOfProducts--
+    decrementMovieCount() {
+      this.selectedMovie.countOfMovies--
       this.$forceUpdate()
     },
-    incrementProductCount() {
-      if (
-        this.selectedProduct.stock >=
-        this.selectedProduct.countOfProducts + 1
-      ) {
-        this.selectedProduct.countOfProducts++
+    incrementMovieCount() {
+      if (this.selectedMovie.stock >= this.selectedMovie.countOfMovies + 1) {
+        this.selectedMovie.countOfMovies++
       }
 
       this.$forceUpdate()
     },
-    addObjectToCart() {
-      var currentCar = this.$store.getters.getCart
-      var indexOfProduct = -1
-      currentCar.forEach((cartObj, index) => {
-        if (cartObj.product && cartObj.product.id == this.selectedProduct.id) {
-          // cartObj.count += this.selectedProduct.countOfProducts;
-          indexOfProduct = index
-        }
-      })
-      this.tempProducts.forEach((singleProduct) => {
-        if (singleProduct.id == this.selectedProduct.id) {
-          singleProduct.stock -= this.selectedProduct.countOfProducts
-        }
-      })
-      if (indexOfProduct !== -1) {
-        currentCar[indexOfProduct].count += this.selectedProduct.countOfProducts
-      } else {
-        var temp = {
-          count: this.selectedProduct.countOfProducts,
-          product: this.selectedProduct,
-          id: this.selectedProduct.id,
-        }
-        this.$store.commit("addToCart", temp)
-      }
-      this.$q.notify({
-        type: "positive",
-        message: "Product(s) added to cart",
-        timeout: 3000,
-      })
-      this.showProductCard = false
-    },
-    deleteProduct(product) {
+
+    deleteMovie(Movie) {
       this.showDeleteDialog = true
-      this.selectedProduct = product
+      this.selectedMovie = Movie
     },
     async deleteAction(value) {
       if (value == 2) {
         await this.$store
-          .dispatch("deleteProduct", this.selectedProduct.id)
+          .dispatch("deleteMovie", this.selectedMovie.id)
           .then(async (res) => {
             this.$q.notify({
               type:
@@ -413,170 +434,38 @@ export default {
       }
       this.showDeleteDialog = false
     },
-    editProductClicked(value) {
-      this.$store.commit("setSelectedProduct", value)
-      this.$router.push({ name: "ProductEdit" })
+    editMovieClicked(value) {
+      this.$store.commit("setSelectedMovie", value)
+      this.$router.push({ name: "MovieEdit" })
     },
     viewMoreClicked(value) {
-      this.$store.commit("setSelectedProduct", value)
-      this.$router.push({ name: "ViewMore" })
-    },
-    priceChanged() {
-      this.applyFilters()
-    },
-    filterOptionSelected(value, index) {
-      this.currentFilters[index] = value
-      if (value[0] && value[0].name) {
-        switch (index) {
-          case 0:
-            this.displayBrands = this.categoriesContainer[value[0].name]
-            break
-          case 1:
-            var currentModels = JSON.parse(
-              JSON.stringify(this.brandsContainer[value[0].name])
-            )
-            //console.log("currentModels", currentModels);
-            var rawData = JSON.parse(JSON.stringify(this.rawOrder))
-            //console.log("rawData", rawData);
-            var selectedCategory = null
-            if (this.currentFilters[0] && this.currentFilters[0][0]) {
-              selectedCategory = JSON.parse(
-                JSON.stringify(this.currentFilters[0][0])
-              )
-            }
-
-            //console.log("selectedCategory", selectedCategory);
-            var selectedBrand = JSON.parse(JSON.stringify(value[0]))
-            currentModels = currentModels.filter((singleModel) => {
-              var found = false
-              rawData.forEach((x) => {
-                if (
-                  singleModel.name == x.Model.name &&
-                  selectedBrand.name == x.Brand.name
-                ) {
-                  if (selectedCategory) {
-                    if (selectedCategory.name == x.Category.name) {
-                      found = true
-                    }
-                  } else {
-                    found = true
-                  }
-                }
-              })
-              return found
-            })
-            this.displayModels = currentModels
-            break
-        }
-      }
-
-      this.applyFilters()
-    },
-    applyFilters() {
-      var data = this.databaseProducts
-      var currentFilters = this.currentFilters
-      var currentPriceRange = this.priceRange
-      if (currentFilters[0] && currentFilters[0].length > 0) {
-        var categoryId = currentFilters[0][0].id
-        data = data.filter((product) => {
-          if (product.category_id == categoryId) return true
-          return false
-        })
-      }
-      if (currentFilters[1] && currentFilters[1].length > 0) {
-        var brandId = currentFilters[1][0].id
-        data = data.filter((product) => {
-          if (product.brand_id == brandId) return true
-          return false
-        })
-      }
-      if (currentFilters[2] && currentFilters[2].length > 0) {
-        var modelId = currentFilters[2][0].id
-        data = data.filter((product) => {
-          if (product.model_id == modelId) return true
-          return false
-        })
-      }
-      data = data.filter((product) => {
-        if (
-          product.price >= currentPriceRange.min &&
-          product.price <= currentPriceRange.max
-        ) {
-          return true
-        }
-        return false
-      })
-      this.tempProducts = data
-    },
-    clearAllFilters() {
-      this.clearData = true
-      this.priceRange.min = this.intervalMin
-      this.priceRange.max = this.intervalMax
-      this.currentFilters = [[], [], []]
-      this.tempProducts = []
-      this.displayCategories = JSON.parse(JSON.stringify(this.pureCategories))
-      this.displayBrands = JSON.parse(JSON.stringify(this.pureBrands))
-      this.displayModels = JSON.parse(JSON.stringify(this.pureModels))
-      setTimeout(() => {
-        this.clearData = false
-        this.tempProducts = this.databaseProducts
-      }, 100)
-
-      this.applyFilters()
-    },
-    sortByPrice(text) {
-      if (text == "asc") {
-        this.tempProducts = this.tempProducts.sort((a, b) => {
-          if (a.price > b.price) {
-            return 1
-          }
-          if (a.price < b.price) {
-            return -1
-          }
-          return 0
-        })
-      } else {
-        this.tempProducts = this.tempProducts.sort((a, b) => {
-          if (a.price > b.price) {
-            return -1
-          }
-          if (a.price < b.price) {
-            return 1
-          }
-          return 0
-        })
-      }
+      this.$store.commit("setSelectedMovie", value)
+      this.$router.push({ name: "ViViewTrailerewMore" })
     },
   },
   computed: {
-    allCategories() {
-      return this.$store.getters.getCategories
-    },
-    allBrands() {
-      return this.$store.getters.getBrands
-    },
     allModels() {
       return this.$store.getters.getModels
     },
-    outputProducts() {
-      return this.filteredProducts.filter((product) => {
+    outputMovies() {
+      return this.filteredMovies.filter((Movie) => {
         if (this.searchText.length > 0) {
-          return product.name
+          return Movie.title
             .toLowerCase()
             .includes(this.searchText.toLowerCase())
         }
         return true
       })
     },
-    filteredProducts() {
-      return this.tempProducts
+    filteredMovies() {
+      return this.tempMovies
     },
     isAdmin() {
       return this.$store.getters.getUserType == "admin"
     },
   },
   async created() {
-    await this.pageCreated()
+    await this.getData()
     if (this.$q.platform.is.mobile) {
       this.showFiltersCard = false
     }
@@ -591,7 +480,7 @@ export default {
     font-size: 16px;
   }
 }
-.product-name {
+.Movie-name {
   font-weight: bold;
   font-size: 16px;
 }

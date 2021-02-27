@@ -1,6 +1,6 @@
 import Vue from "vue"
 import VueRouter from "vue-router"
-import Products from "../views/Products.vue"
+import Movies from "../views/Movies.vue"
 
 Vue.use(VueRouter)
 
@@ -12,66 +12,19 @@ const routes = [
     children: [
       {
         path: "/",
-        name: "Products",
-        component: Products,
+        name: "Movies",
+        component: Movies,
+      },
+
+      {
+        path: "/viewTrailer",
+        name: "ViewTrailer",
+        component: () => import("../components/ViewTrailer.vue"),
       },
       {
-        path: "/cart",
-        name: "Cart",
-        component: () => import("../components/Cart.vue"),
-      },
-      {
-        path: "/myOrders",
-        name: "MyOrders",
-        component: () => import("../components/MyOrders.vue"),
-      },
-      {
-        path: "/profile",
-        name: "Profile",
-        component: () => import("../components/Profile.vue"),
-      },
-      {
-        path: "/categories",
-        name: "Categories",
-        component: () =>
-          import("../components/ProductsManagement/Categories.vue"),
-      },
-      {
-        path: "/brands",
-        name: "Brands",
-        component: () => import("../components/ProductsManagement/Brands.vue"),
-      },
-      {
-        path: "/models",
-        name: "Models",
-        component: () => import("../components/ProductsManagement/Models.vue"),
-      },
-      {
-        path: "/allOrders",
-        name: "AllOrders",
-        component: () => import("../components/UsersManagement/AllOrders.vue"),
-      },
-      {
-        path: "/allCustomers",
-        name: "AllCustomers",
-        component: () =>
-          import("../components/UsersManagement/AllCustomers.vue"),
-      },
-      {
-        path: "/addProduct",
-        name: "AddProduct",
-        component: () =>
-          import("../components/ProductsManagement/CreateProduct.vue"),
-      },
-      {
-        path: "/productEdit",
-        name: "ProductEdit",
-        component: () => import("../components/ProductEdit.vue"),
-      },
-      {
-        path: "/viewMore",
-        name: "ViewMore",
-        component: () => import("../components/ViewMore.vue"),
+        path: "/requestTrailer",
+        name: "RequestTrailer",
+        component: () => import("../components/RequestTrailer.vue"),
       },
       {
         path: "/searchProduct",

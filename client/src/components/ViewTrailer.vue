@@ -34,7 +34,7 @@
                     <div
                       class="main-image"
                       :style="{
-                        'background-image': 'url(' + mainImage + ')'
+                        'background-image': 'url(' + mainImage + ')',
                       }"
                     ></div>
                   </div>
@@ -44,7 +44,7 @@
                       v-for="(image, index) in CurrentProduct.images"
                       :key="index"
                       :style="{
-                        'background-image': 'url(' + image.img + ')'
+                        'background-image': 'url(' + image.img + ')',
                       }"
                       @click="mainImage = image.img"
                     >
@@ -62,7 +62,7 @@
                           :key="index"
                           :style="{
                             'background-image': 'url(' + image.img + ')',
-                            width: '100%'
+                            width: '100%',
                           }"
                           @click="mainImage = image.img"
                         >
@@ -74,7 +74,7 @@
                       <div
                         class="main-image"
                         :style="{
-                          'background-image': 'url(' + mainImage + ')'
+                          'background-image': 'url(' + mainImage + ')',
                         }"
                       ></div>
                     </div>
@@ -221,76 +221,76 @@
 
 <script>
 export default {
-  name: "ViewMore",
+  name: "ViewTrailer",
   data() {
     return {
       slide: 0,
       countOfProducts: 1,
       showProductCard: false,
-      mainImage: ""
-    };
+      mainImage: "",
+    }
   },
   methods: {
     addToCartClicked() {
-      var token = this.$store.getters.getToken;
+      var token = this.$store.getters.getToken
       if (!token) {
         this.$q.notify({
           type: "warning",
           message: "Please login or register to add products to your cart",
-          timeout: 5000
-        });
+          timeout: 5000,
+        })
       } else {
-        this.showProductCard = true;
+        this.showProductCard = true
       }
     },
     incrementProductCount() {
       if (this.CurrentProduct.stock >= this.countOfProducts + 1) {
-        this.countOfProducts++;
+        this.countOfProducts++
       }
     },
     addObjectToCart() {
-      var currentCart = this.$store.getters.getCart;
-      var indexOfProduct = -1;
+      var currentCart = this.$store.getters.getCart
+      var indexOfProduct = -1
       currentCart.forEach((cartObj, index) => {
         if (cartObj.product && cartObj.product.id == this.CurrentProduct.id) {
-          indexOfProduct = index;
+          indexOfProduct = index
         }
-      });
-      var products = this.$store.getters.getProducts;
-      products.forEach(singleProduct => {
+      })
+      var products = this.$store.getters.getProducts
+      products.forEach((singleProduct) => {
         if (singleProduct.id == this.CurrentProduct.id) {
-          singleProduct.stock -= this.countOfProducts;
+          singleProduct.stock -= this.countOfProducts
         }
-      });
+      })
       if (indexOfProduct !== -1) {
-        currentCart[indexOfProduct].count += this.countOfProducts;
+        currentCart[indexOfProduct].count += this.countOfProducts
       } else {
         var temp = {
           count: this.countOfProducts,
           product: this.CurrentProduct,
-          id: this.CurrentProduct.id
-        };
-        this.$store.commit("addToCart", temp);
+          id: this.CurrentProduct.id,
+        }
+        this.$store.commit("addToCart", temp)
       }
       this.$q.notify({
         type: "positive",
         message: "Product(s) added to cart",
-        timeout: 3000
-      });
-      this.showProductCard = false;
-      this.countOfProducts = 1;
-    }
+        timeout: 3000,
+      })
+      this.showProductCard = false
+      this.countOfProducts = 1
+    },
   },
   computed: {
     CurrentProduct() {
-      return this.$store.getters.getSelectedProduct;
-    }
+      return this.$store.getters.getSelectedProduct
+    },
   },
   created() {
-    window.scrollTo(0, 0);
-    this.mainImage = this.CurrentProduct.images[0].img;
-  }
-};
+    window.scrollTo(0, 0)
+    this.mainImage = this.CurrentProduct.images[0].img
+  },
+}
 </script>
 
 <style lang="scss" scoped>

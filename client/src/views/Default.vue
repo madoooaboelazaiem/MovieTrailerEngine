@@ -15,7 +15,7 @@
           <q-toolbar-title
             class="title-head"
             shrink
-            @click="$router.push({ name: 'Products' })"
+            @click="$router.push({ name: 'Movies' })"
           >
             <q-avatar>
               <img style="height:30px;" src="../assets/iconOnly.png" />
@@ -163,17 +163,19 @@
     <q-drawer
       v-model="leftDrawerOpen"
       bordered
+      :breakpoint="700"
+      elevated
       content-class="bg-grey-2"
       behavior="mobile"
     >
-      <q-list v-if="isAdmin">
-        <q-item-label header>Products Management</q-item-label>
-        <q-item clickable @click="changeRoute('AddProduct')">
+      <q-list>
+        <q-item-label header>CouchPotato</q-item-label>
+        <q-item clickable @click="changeRoute('RequestTrailer')">
           <q-item-section avatar>
             <q-icon name="add_circle" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Add Product</q-item-label>
+            <q-item-label>Request Trailer</q-item-label>
           </q-item-section>
         </q-item>
         <q-item clickable @click="changeRoute('Categories')">
@@ -181,40 +183,7 @@
             <q-icon name="category" />
           </q-item-section>
           <q-item-section>
-            <q-item-label>Edit Categories</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="changeRoute('Brands')">
-          <q-item-section avatar>
-            <q-icon name="copyright" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Edit Brands</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="changeRoute('Models')">
-          <q-item-section avatar>
-            <q-icon name="far fa-clipboard" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>Edit Models</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item-label header>Users Management</q-item-label>
-        <q-item clickable @click="changeRoute('AllCustomers')">
-          <q-item-section avatar>
-            <q-icon name="people" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>View Customers</q-item-label>
-          </q-item-section>
-        </q-item>
-        <q-item clickable @click="changeRoute('AllOrders')">
-          <q-item-section avatar>
-            <q-icon name="far fa-clipboard" />
-          </q-item-section>
-          <q-item-section>
-            <q-item-label>View Orders</q-item-label>
+            <q-item-label>Favourites</q-item-label>
           </q-item-section>
         </q-item>
       </q-list>
@@ -233,7 +202,7 @@ export default {
 
   data() {
     return {
-      leftDrawerOpen: false,
+      leftDrawerOpen: true,
     }
   },
   methods: {
@@ -242,10 +211,7 @@ export default {
     },
     logout() {
       this.$store.commit("logout")
-      this.$router.push({ name: "Products" })
-    },
-    clearCart() {
-      this.$store.commit("clearCart")
+      this.$router.push({ name: "Default" })
     },
     searchClicked() {
       this.$router.push({ name: "Search" })
