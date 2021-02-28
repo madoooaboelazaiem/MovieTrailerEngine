@@ -186,7 +186,7 @@ export default {
       if (!token) {
         this.$q.notify({
           type: "warning",
-          message: "Please login or register to add products to your cart",
+          message: "Please login or register to use this feature",
           timeout: 5000,
         })
       } else {
@@ -215,7 +215,7 @@ export default {
       if (!token) {
         this.$q.notify({
           type: "warning",
-          message: "Please login or register to add products to your cart",
+          message: "Please login or register to use this feature",
           timeout: 5000,
         })
       } else {

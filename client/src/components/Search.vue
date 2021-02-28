@@ -119,101 +119,6 @@
         </div>
       </div>
     </div>
-    <div class="col-12" v-if="$q.platform.is.mobile">
-      <div class="row justify-end">
-        <q-btn
-          size="sm"
-          class=" col-shrink bg-primary text-white q-mx-sm q-mb-md"
-          @click="showFiltersCard = !showFiltersCard"
-          icon="sort"
-          :label="showFiltersCard ? 'Hide Filters' : 'Show Filters'"
-        ></q-btn>
-      </div>
-    </div>
-    <q-dialog v-model="showMovieCard">
-      <q-card style="width:80vw">
-        <q-card-section class="row items-center q-pb-none">
-          <div class="text-h6">Movie:</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
-        </q-card-section>
-
-        <q-card-section v-if="showMovieCard">
-          <div class="row jusitify-between">
-            <div class="col">
-              <div class="column">
-                <div class="col">Name : {{ selectedMovie.name }}</div>
-                <div class="col">
-                  Category: {{ selectedMovie.Category.name }}
-                </div>
-                <div class="col">Brand: {{ selectedMovie.Brand.name }}</div>
-                <div class="col">Model: {{ selectedMovie.Model.name }}</div>
-                <div class="col">Price: {{ selectedMovie.price }} EGP</div>
-              </div>
-            </div>
-            <div class="col-shrink ">
-              <div class="row items-center" style="height:100%;">
-                <div class="col">
-                  <q-btn
-                    round
-                    dense
-                    class="bg-red-8 text-white"
-                    size="md"
-                    icon="remove"
-                    :disable="selectedMovie.countOfMovies == 1"
-                    @click="decrementMovieCount"
-                  />
-                </div>
-                <div class="col-shrink">
-                  <div class="text-h6 q-px-sm">
-                    {{ selectedMovie.countOfMovies }}
-                  </div>
-                </div>
-                <div class="col">
-                  <q-btn
-                    round
-                    dense
-                    class="bg-green-14 text-white"
-                    size="md"
-                    icon="add"
-                    @click="incrementMovieCount"
-                    :disable="
-                      selectedMovie.stock <= selectedMovie.countOfMovies
-                    "
-                    :title="
-                      selectedMovie.stock <= selectedMovie.countOfMovies
-                        ? 'There are no more available Movies'
-                        : ''
-                    "
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-          <div
-            class=" row q-mt-md items-center"
-            :class="{ row: !$q.platform.is.mobile }"
-          >
-            <div class="col-auto">
-              Total Price:
-              {{ selectedMovie.price * selectedMovie.countOfMovies }}
-              EGP
-            </div>
-            <q-space />
-            <div class="col-shrink">
-              <q-btn
-                dense
-                class="bg-green-14 text-white"
-                :size="$q.screen.gt.xs ? 'md' : 'sm'"
-                icon="add"
-                label="Add To Cart"
-                @click="addObjectToCart"
-              />
-            </div>
-          </div>
-        </q-card-section>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -261,7 +166,7 @@ export default {
       if (!token) {
         this.$q.notify({
           type: "warning",
-          message: "Please login or register to add products to your cart",
+          message: "Please login or register to use this feature",
           timeout: 5000,
         })
       } else {
@@ -297,7 +202,7 @@ export default {
       if (!token) {
         this.$q.notify({
           type: "warning",
-          message: "Please login or register to add products to your cart",
+          message: "Please login or register to use this feature",
           timeout: 5000,
         })
       } else {
