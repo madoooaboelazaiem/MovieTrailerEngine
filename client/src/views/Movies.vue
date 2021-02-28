@@ -83,6 +83,47 @@
         </div>
       </div>
     </div>
+    <q-dialog v-model="showMovieTrailer">
+      <q-card style="width:100%">
+        <q-card-section class="row items-center q-pb-none">
+          <div class="text-center text-white text-h6">Trailer</div>
+          <q-space />
+          <q-btn
+            class=" text-white "
+            icon="close"
+            flat
+            round
+            dense
+            v-close-popup
+          />
+        </q-card-section>
+
+        <q-card-section v-if="showMovieTrailer">
+          <div class="row jusitify-between">
+            <div class="col">
+              <div ref="card" class="carousel--card">
+                <iframe
+                  :title="`${selectedmovie.name}`"
+                  id="ytplayer"
+                  type="text/html"
+                  :src="
+                    `https://www.youtube.com/embed/${
+                      selectedmovie.trailer.split('v=')[1]
+                    }`
+                  "
+                  frameborder="0"
+                  allowfullscreen
+                ></iframe>
+              </div>
+            </div>
+          </div>
+          <div
+            class=" row q-mt-md items-center"
+            :class="{ row: !$q.platform.is.mobile }"
+          ></div>
+        </q-card-section>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
@@ -176,8 +217,26 @@ export default {
 .q-page {
   background-color: black;
 }
+iframe {
+  width: 70vw;
+  height: 40vw;
+}
+.carousel--card {
+  cursor: pointer;
+  margin: 0 20px;
+}
+@media (min-width: 600px) {
+  .q-dialog__inner--minimized > div {
+    max-width: 80%;
+    background-color: transparent;
+  }
+
+  // Your media styles
+}
+// @media (min-width: 600px)
+
 .my-card {
   width: 100%;
-  max-width: 250px;
+  max-width: 100%;
 }
 </style>
