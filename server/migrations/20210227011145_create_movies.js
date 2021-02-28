@@ -1,12 +1,14 @@
 exports.up = (knex) =>
   knex.schema.createTable("movies", (table) => {
     table.increments("id").primary()
-    table.string("name", 100)
-    table.string("description", 255)
-    table.string("year", 15)
-    table.string("trailer", 255)
-    table.string("image", 255)
-    table.string("director", 255)
+    table.string("name")
+    table.text("description")
+    table.string("year")
+    table.text("trailer")
+    table.string("image")
+    table.string("director")
+    table.boolean("favourites").defaultTo(false)
+    table.string("tmdb_id")
   })
 
 exports.down = (knex) => knex.schema.dropTableIfExists("movies")

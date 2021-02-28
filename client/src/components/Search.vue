@@ -40,7 +40,7 @@
           <div class="column justify-between" style="height:100%;">
             <div class="col-shrink">
               <q-img
-                :src="movie.fanart"
+                :src="movie.image"
                 :ratio="16 / 9"
                 placeholder-src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAJYAAACWBAMAAADOL2zRAAAAG1BMVEXMzMyWlpaqqqq3t7fFxcW+vr6xsbGjo6OcnJyLKnDGAAAACXBIWXMAAA7EAAAOxAGVKw4bAAABAElEQVRoge3SMW+DMBiE4YsxJqMJtHOTITPeOsLQnaodGImEUMZEkZhRUqn92f0MaTubtfeMh/QGHANEREREREREREREtIJJ0xbH299kp8l8FaGtLdTQ19HjofxZlJ0m1+eBKZcikd9PWtXC5DoDotRO04B9YOvFIXmXLy2jEbiqE6Df7DTleA5socLqvEFVxtJyrpZFWz/pHM2CVte0lS8g2eDe6prOyqPglhzROL+Xye4tmT4WvRcQ2/m81p+/rdguOi8Hc5L/8Qk4vhZzy08DduGt9eVQyP2qoTM1zi0/uf4hvBWf5c77e69Gf798y08L7j0RERERERERERH9P99ZpSVRivB/rgAAAABJRU5ErkJggg=="
                 spinner-color="white"
@@ -49,18 +49,15 @@
               <q-card-section>
                 <div class="row justify-between">
                   <div class="col-shrink text-subtitle1 text-weight-bold">
-                    {{ movie.original_title }}
+                    {{ movie.name }}
                   </div>
                   <div class="col-shrink text-subtitle1">
-                    {{ movie.vote_average }}
+                    {{ movie.year }}
                   </div>
                 </div>
               </q-card-section>
               <q-card-section class="q-pt-none">
-                {{ movie.name }}
-              </q-card-section>
-              <q-card-section class="q-pt-none">
-                {{ movie.overview }}
+                {{ movie.description }}
               </q-card-section>
             </div>
             <div class="col-shrink">
@@ -68,7 +65,7 @@
                 <q-btn
                   class="bg-indigo-6 text-white q-mx-sm"
                   v-if="$q.screen.gt.sm"
-                  @click="viewMoreClicked(movie)"
+                  @click="viewTrailerClicked(movie)"
                   >Trailer</q-btn
                 >
                 <q-btn
@@ -76,11 +73,11 @@
                   class="bg-indigo-6 text-white q-mx-xs"
                   icon="movie"
                   v-else
-                  @click="viewMoreClicked(movie)"
+                  @click="viewTrailerClicked(movie)"
                 ></q-btn>
                 <q-btn
                   class="bg-green-7 text-white"
-                  @click="addToCartClicked(movie)"
+                  @click="shareClicked(movie)"
                   v-if="$q.screen.gt.sm"
                   >Share</q-btn
                 >
@@ -89,18 +86,16 @@
                   class="bg-green-7 text-white"
                   icon="share"
                   v-else
-                  @click="addToCartClicked(movie)"
+                  @click="shareClicked(movie)"
                 ></q-btn>
-                <!-- <div class="q-pa-md">
-                  <q-rating
-                    v-model="ratingModel"
-                    size="2em"
-                    :max="1"
-                    color="warning"
-                    @click="addAndRemoveFromFavourites()"
-                  >
-                  </q-rating>
-                </div> -->
+                <q-btn
+                  v-model="movie.favourites"
+                  round
+                  class="bg-white"
+                  :class="movie.favourites ? 'text-orange' : ''"
+                  icon="grade"
+                  @click="addAndRemoveFromFavourites(movie)"
+                ></q-btn>
               </q-card-actions>
             </div>
           </div>
@@ -205,32 +200,6 @@
         </q-card-section>
       </q-card>
     </q-dialog>
-    <q-dialog v-model="showDeleteDialog" persistent>
-      <q-card>
-        <q-card-section class="row items-center">
-          <span class="q-ml-sm"
-            >Are you sure you want to delete this Movie?</span
-          >
-        </q-card-section>
-
-        <q-card-actions align="right">
-          <q-btn
-            flat
-            label="No"
-            color="primary"
-            v-close-popup
-            @click="deleteAction(1)"
-          />
-          <q-btn
-            flat
-            label="Yes"
-            color="primary"
-            @click="deleteAction(2)"
-            v-close-popup
-          />
-        </q-card-actions>
-      </q-card>
-    </q-dialog>
   </div>
 </template>
 
@@ -271,103 +240,21 @@ export default {
     }
   },
   methods: {
-    async pageCreated() {
-      await this.$store.dispatch("fetchMoviesTMDB")
-      var allMovies = this.$store.getters.getMovies
-      var currentCar = this.$store.getters.getCart
-      var tempCategories = []
-      var tempBrands = []
-      var tempModels = []
-      var maxPrice = 0
-      var data = []
-      allMovies.forEach((Movie) => {
-        currentCar.forEach((cartObj) => {
-          if (cartObj.Movie && cartObj.Movie.id == Movie.id) {
-            Movie.stock -= cartObj.count
-          }
-        })
-        if (Movie.price > maxPrice) {
-          maxPrice = Movie.price
-        }
-        data.push({
-          Category: Movie.Category,
-          Brand: Movie.Brand,
-          Model: Movie.Model,
-        })
-        if (this.brandsContainer[Movie.Brand.name])
-          this.brandsContainer[Movie.Brand.name].push(Movie.Model)
-        else this.brandsContainer[Movie.Brand.name] = [Movie.Model]
-        if (this.categoriesContainer[Movie.Category.name])
-          this.categoriesContainer[Movie.Category.name].push(Movie.Brand)
-        else this.categoriesContainer[Movie.Category.name] = [Movie.Brand]
-
-        tempModels.push(Movie.Model)
-        tempCategories.push(Movie.Category)
-        tempBrands.push(Movie.Brand)
-      })
-      this.rawOrder = data
-      Object.keys(this.categoriesContainer).forEach((key) => {
-        // eslint-disable-next-line no-unused-vars
-        var currentArray = this.categoriesContainer[key]
-        currentArray = Object.values(
-          currentArray.reduce(
-            (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
-            {}
-          )
-        )
-        this.categoriesContainer[key] = currentArray
-      })
-      Object.keys(this.brandsContainer).forEach((key) => {
-        // eslint-disable-next-line no-unused-vars
-        var currentArray = this.brandsContainer[key]
-        currentArray = Object.values(
-          currentArray.reduce(
-            (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
-            {}
-          )
-        )
-        this.brandsContainer[key] = currentArray
-      })
-
-      allMovies = allMovies.filter((Movie) => Movie.stock > 0)
-      this.intervalMax = maxPrice
-      this.priceRange.max = maxPrice
-      this.databaseMovies = allMovies
-      this.tempMovies = allMovies
-      tempCategories = Object.values(
-        tempCategories.reduce(
-          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
-          {}
-        )
-      )
-      tempBrands = Object.values(
-        tempBrands.reduce(
-          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
-          {}
-        )
-      )
-      tempModels = Object.values(
-        tempModels.reduce(
-          (acc, cur) => Object.assign(acc, { [cur.name]: cur }),
-          {}
-        )
-      )
-      this.displayCategories = tempCategories
-      this.displayBrands = tempBrands
-      this.displayModels = tempModels
-      this.pureCategories = JSON.parse(JSON.stringify(tempCategories))
-      this.pureBrands = JSON.parse(JSON.stringify(tempBrands))
-      this.pureModels = JSON.parse(JSON.stringify(tempModels))
-    },
-
     async getData() {
-      await Promise.all([this.$store.dispatch("fetchMoviesTMDB")])
+      await Promise.all([
+        this.$store.dispatch("fetchMoviesTMDB"),
+        this.$store.dispatch("addMovies"),
+      ])
+      await Promise.all([this.$store.dispatch("fetchMovies")])
 
-      var data = JSON.parse(JSON.stringify(this.$store.getters.getTrending))
+      var data = JSON.parse(JSON.stringify(this.$store.getters.getMovies))
+      // var favouritesData = JSON.parse(
+      //   JSON.stringify([]) //this.$store.getters.getFavourites
+      // )
+      data.forEach((movie) => {
+        if (!movie.favourites) movie.favourites = false
+      })
       this.tempMovies = data
-      // console.log(categoriesHolder);
-      // console.log(brandsHolder);
-      // console.log(brandsUbmrella);
     },
     clicked() {
       this.animation = !this.animation
@@ -383,56 +270,32 @@ export default {
       // this.$q.loadingBar.stop();
       // this.$q.loadingBar.increment(50);
     },
-    addToCartClicked(MovieObject) {
-      var token = this.$store.getters.getToken
-      if (!token) {
+    async addAndRemoveFromFavourites(value) {
+      this.$store.commit("setSelectedMovie", value)
+      console.log(value, "favourites")
+      await this.$store.dispatch("editFavourites").then(async (res) => {
         this.$q.notify({
-          type: "warning",
-          message: "Please login or register to add Movies to your cart",
-          timeout: 5000,
+          type: res.status && res.status == "success" ? "positive" : "negative",
+          message: res.message ? res.message : "Error Occured",
+          timeout: 2000,
         })
-        // setTimeout(() => {
-        //   this.$router.push({ name: "Login" });
-        // }, 1000);
-      } else {
-        this.showMovieCard = true
-        MovieObject.countOfMovies = 1
-        this.selectedMovie = MovieObject
-      }
+        if (res.status == "success") {
+          await this.getData()
+        }
+      })
     },
-    decrementMovieCount() {
-      this.selectedMovie.countOfMovies--
-      this.$forceUpdate()
+    viewTrailerClicked(value) {
+      this.showMovieTrailer = true
+      this.selectedmovie = value
+      // this.$store.commit("setSelectedMovie", value)
+      // this.$router.push({ name: "ViewTrailer" })
     },
-    incrementMovieCount() {
-      if (this.selectedMovie.stock >= this.selectedMovie.countOfMovies + 1) {
-        this.selectedMovie.countOfMovies++
-      }
-
-      this.$forceUpdate()
-    },
-
-    deleteMovie(Movie) {
-      this.showDeleteDialog = true
-      this.selectedMovie = Movie
-    },
-    async deleteAction(value) {
-      if (value == 2) {
-        await this.$store
-          .dispatch("deleteMovie", this.selectedMovie.id)
-          .then(async (res) => {
-            this.$q.notify({
-              type:
-                res.status && res.status == "success" ? "positive" : "negative",
-              message: res.message ? res.message : "Error Occured",
-              timeout: 2000,
-            })
-            if (res.status == "success") {
-              await this.getData()
-            }
-          })
-      }
-      this.showDeleteDialog = false
+    shareClicked(value) {
+      // this.showMovieTrailer = true
+      // this.selectedmovie = value
+      this.$store.commit("setSelectedMovie", value)
+      window.location.href =
+        "https://www.facebook.com/sharer/sharer.php?u=" + value.trailer
     },
     editMovieClicked(value) {
       this.$store.commit("setSelectedMovie", value)
@@ -450,7 +313,7 @@ export default {
     outputMovies() {
       return this.filteredMovies.filter((Movie) => {
         if (this.searchText.length > 0) {
-          return Movie.title
+          return Movie.name
             .toLowerCase()
             .includes(this.searchText.toLowerCase())
         }

@@ -18,7 +18,9 @@ export default new Vuex.Store({
     token: null,
     movies: [],
     trending: [],
+    favourite: [],
     selectedMovie: {},
+    selectedFavourite: {},
   },
   getters: {
     getUserId(state) {
@@ -38,6 +40,9 @@ export default new Vuex.Store({
     },
     getSelectedMovie(state) {
       return state.selectedMovie
+    },
+    getFavourites(state) {
+      return state.favourite
     },
   },
   mutations: {
@@ -64,13 +69,15 @@ export default new Vuex.Store({
     setTrending(state, value) {
       state.trending = value
     },
+    setFavourites(state, value) {
+      state.favourite = value
+    },
   },
   actions: {
     async fetchMoviesTMDB(context) {
       await axios
         .get(process.env.VUE_APP_tmdb_URI)
         .then((res) => {
-          console.log(res)
           if (res.status == 200) {
             context.commit("setTrending", res.data.results)
           }
@@ -87,6 +94,51 @@ export default new Vuex.Store({
           }
         })
         .catch((err) => console.log(err))
+    },
+
+    async fetchFavourites(context) {
+      await api()
+        .get(`movies/favourites`)
+        .then((res) => {
+          if (res.data.status == "success") {
+            var data = res.data.data
+            context.commit("setFavourites", data)
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    async addMovies(context) {
+      const movies = context.getters.getTrending
+      movies.forEach((movie) => {
+        movie.name = movie.original_title
+        movie.year = movie.release_date
+        movie.description = movie.overview
+        movie.image = movie.poster_path
+        movie.tmdb_id = movie.id
+        movie
+      })
+      await api()
+        .post(`movies/`, movies)
+        .then((res) => {
+          if (res.data.status == "success") {
+            var data = res.data.data.flat(1)
+            context.commit("setMovies", data)
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    async editFavourites(context) {
+      const movie = context.getters.getSelectedMovie
+      return api()
+        .put("movies/", movie)
+        .then((res) => {
+          if (res.data.status == "success") {
+            return res.data
+          }
+        })
+        .catch((err) => {
+          return err.response.data
+        })
     },
   },
   plugins: [vuexLocal.plugin],

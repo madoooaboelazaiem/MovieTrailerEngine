@@ -41,7 +41,7 @@
                       <q-input
                         bg-color="white"
                         outlined
-                        v-model="stock"
+                        v-model="year"
                         label="Year"
                         type="number"
                       />
@@ -58,7 +58,7 @@
                           color="green-7"
                           label="Add Request"
                           :size="$q.platform.is.mobile ? 'sm' : 'md'"
-                          @click="createNewProduct"
+                          @click="createNewRequest"
                         />
                       </div>
                       <div class="col-shrink q-my-sm q-mx-xs">
@@ -97,7 +97,7 @@ export default {
     }
   },
   methods: {
-    async createNewProduct() {
+    async createNewRequest() {
       if (
         !this.name ||
         this.name.length == 0 ||
@@ -117,15 +117,17 @@ export default {
           this.description && this.description.length > 0
             ? this.description
             : null,
+        year: this.year ? this.year : null,
       }
+      console.log(apiObject)
 
       await api()
-        .post(`requests/`, apiObject)
+        .post(`/movies/requestTrailer`, apiObject)
         .then((res) => {
           if (res.data.status && res.data.status == "success") {
             this.$q.notify({
               type: "positive",
-              message: "Product created successfully",
+              message: "request created successfully",
               timeout: 2000,
             })
             this.clearAllData()
@@ -150,17 +152,6 @@ export default {
         this.dataEraser = false
       }, 100)
     },
-    // imageLinkInput(value, dis) {
-    //   var inputIndex = -1;
-    //   this.imageLinks.forEach((input, index) => {
-    //     if (input.distinctNumber == dis) {
-    //       inputIndex = index;
-    //     }
-    //   });
-    //   if (inputIndex !== -1) {
-    //     this.imageLinks[inputIndex].link = value;
-    //   }
-    // }
   },
   computed: {},
   created() {

@@ -31,6 +31,11 @@ const routes = [
         name: "Search",
         component: () => import("../components/Search.vue"),
       },
+      {
+        path: "/viewFavourites",
+        name: "ViewFavourites",
+        component: () => import("../components/Favourites.vue"),
+      },
     ],
   },
   {
@@ -46,6 +51,10 @@ const routes = [
     path: "/login",
     name: "Login",
     component: () => import("../views/User/Login"),
+  },
+  {
+    path: "/shareTrailer",
+    name: "ShareTrailer",
   },
   {
     path: "/register",

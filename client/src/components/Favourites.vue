@@ -12,7 +12,7 @@
                   'q-ml-sm': $q.screen.gt.sm,
                   'animated swing': animation,
                 }"
-                v-for="(movie, index) in movies"
+                v-for="(movie, index) in favourites"
                 :key="index"
               >
                 <div class="column justify-between" style="height:100%;">
@@ -90,33 +90,29 @@
 // import api from "../store/api";
 // import axios from "axios";
 export default {
-  name: "Movies",
+  name: "Favourites",
   data() {
     return {
-      movies: [],
+      favourites: [],
       animation: false,
       showMovieTrailer: false,
-      selectedmovie: {},
+      selectedFavourite: {},
       slide: 1,
       ratingModel: 0,
     }
   },
   methods: {
     async getData() {
-      await Promise.all([
-        this.$store.dispatch("fetchMoviesTMDB"),
-        this.$store.dispatch("addMovies"),
-      ])
-      await Promise.all([this.$store.dispatch("fetchMovies")])
+      await Promise.all([this.$store.dispatch("fetchFavourites")])
 
-      var data = JSON.parse(JSON.stringify(this.$store.getters.getMovies))
+      var data = JSON.parse(JSON.stringify(this.$store.getters.getFavourites))
       // var favouritesData = JSON.parse(
       //   JSON.stringify([]) //this.$store.getters.getFavourites
       // )
       data.forEach((movie) => {
         if (!movie.favourites) movie.favourites = false
       })
-      this.movies = data
+      this.favourites = data
     },
     clicked() {
       this.animation = !this.animation
@@ -125,8 +121,6 @@ export default {
     },
     showLoading() {
       this.$q.loadingBar.start()
-      // this.$q.loadingBar.stop();
-      // this.$q.loadingBar.increment(50);
     },
     async addAndRemoveFromFavourites(value) {
       this.$store.commit("setSelectedMovie", value)
@@ -144,7 +138,7 @@ export default {
     },
     viewTrailerClicked(value) {
       this.showMovieTrailer = true
-      this.selectedmovie = value
+      this.selectedFavourite = value
       // this.$store.commit("setSelectedMovie", value)
       // this.$router.push({ name: "ViewTrailer" })
     },

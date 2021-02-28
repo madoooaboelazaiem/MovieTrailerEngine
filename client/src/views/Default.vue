@@ -178,7 +178,7 @@
             <q-item-label>Request Trailer</q-item-label>
           </q-item-section>
         </q-item>
-        <q-item clickable @click="changeRoute('Categories')">
+        <q-item clickable @click="changeRoute('ViewFavourites')">
           <q-item-section avatar>
             <q-icon name="category" />
           </q-item-section>
