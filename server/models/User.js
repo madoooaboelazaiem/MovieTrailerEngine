@@ -39,7 +39,7 @@ class User extends Model {
     })
   }
   static async updatePassword(id, newPassword) {
-    var find = await customers.query().findOne({
+    var find = await User.query().findOne({
       id,
     })
     var insert = await find.$query().updateAndFetch({

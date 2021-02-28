@@ -18,7 +18,6 @@ const addMovie = async function (req, res) {
 }
 const editMovie = async function (req, res) {
   var valid_params = req.body
-  console.log(req.body)
   if (!valid_params) {
     return res
       .status(400)

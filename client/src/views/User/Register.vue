@@ -118,8 +118,6 @@ export default {
       confirmPassword: null,
       firstName: null,
       lastName: null,
-      address: null,
-      phoneNumber: null,
       isPwd: true,
       isPwdConfirm: true,
     }
@@ -135,14 +133,7 @@ export default {
         })
         return
       }
-      if (
-        !this.email ||
-        !this.password ||
-        !this.firstName ||
-        !this.lastName ||
-        !this.address ||
-        !this.phoneNumber
-      ) {
+      if (!this.email || !this.password || !this.firstName || !this.lastName) {
         this.$q.notify({
           position: "bottom",
           type: "negative",
@@ -155,21 +146,9 @@ export default {
           password: this.password,
           first_name: this.firstName,
           last_name: this.lastName,
-          address: this.address,
-          phone_number: this.phoneNumber,
-        }
-        var faultyFields = this.validateFields(apiObject)
-        if (faultyFields.error) {
-          this.$q.notify({
-            position: "bottom",
-            type: "negative",
-            timeout: "2000",
-            message: faultyFields.message,
-          })
-          return
         }
         await api()
-          .post("customers/customerSignup", apiObject)
+          .post("users", apiObject)
           .then((res) => {
             const response = res.data
             if (response.status == "success") {
@@ -203,27 +182,6 @@ export default {
           })
       }
     },
-    checkNumber(value) {
-      const lowerLetterBegin = 96
-      const lowerLetterEnd = 123
-      const upperLetterBegin = 64
-      const upperLetterEnd = 91
-      if (typeof value === "undefined" || value.length === 0) {
-        return true
-      } else {
-        for (var i = 0; i < value.length; i++) {
-          if (
-            (value.charCodeAt(i) > lowerLetterBegin &&
-              value.charCodeAt(i) < lowerLetterEnd) ||
-            (value.charCodeAt(i) > upperLetterBegin &&
-              value.charCodeAt(i) < upperLetterEnd)
-          ) {
-            return true
-          }
-        }
-        return false
-      }
-    },
     validateFields(inputs) {
       var result = { error: false, message: "" }
       var email = inputs.email
@@ -232,15 +190,11 @@ export default {
         result.error = true
       }
       var password = inputs.password
-      if (!password || password.length < 8) {
+      if (!password || password.length < 6) {
         result.message = "Password needs to be 8 characters long or more"
         result.error = true
       }
-      var phone_number = inputs.phone_number
-      if (isNaN(phone_number)) {
-        result.message = "Phone number cannot contain characters"
-        result.error = true
-      }
+
       return result
     },
   },

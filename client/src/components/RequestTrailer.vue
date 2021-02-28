@@ -119,7 +119,6 @@ export default {
             : null,
         year: this.year ? this.year : null,
       }
-      console.log(apiObject)
 
       await api()
         .post(`/movies/requestTrailer`, apiObject)

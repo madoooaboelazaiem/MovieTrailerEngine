@@ -102,7 +102,21 @@
         </q-card>
       </div>
       <div v-else>
-        <div class="row justify-center text-white">Button</div>
+        <div class="row justify-center text-white">
+          <q-btn
+            class="bg-green-9 text-white"
+            @click="searchTrailer()"
+            v-if="$q.screen.gt.sm"
+            >Dig Deeper</q-btn
+          >
+          <q-btn
+            round
+            class="bg-green-9 text-white"
+            icon="search"
+            v-else
+            @click="searchTrailer()"
+          ></q-btn>
+        </div>
       </div>
     </div>
     <div class="col-12" v-if="$q.platform.is.mobile">
@@ -213,30 +227,11 @@ export default {
       databaseMovies: [],
       searchText: "",
       animation: false,
-      intervalMin: 0,
-      intervalMax: 0,
-      priceRange: {
-        min: 0,
-        max: 0,
-      },
       tempMovies: [],
-      currentFilters: [],
       clearData: false,
       showFiltersCard: true,
       showMovieCard: false,
-      showDeleteDialog: false,
       selectedMovie: { name: "" },
-      brandsContainer: {},
-      categoriesContainer: {},
-      // modelsContainer: [],
-      displayCategories: [],
-      displayBrands: [],
-      displayModels: [],
-      rawOrder: [],
-      pureCategories: [],
-      pureBrands: [],
-      pureModels: [],
-      showSortByPrice: false,
     }
   },
   methods: {
@@ -248,9 +243,6 @@ export default {
       await Promise.all([this.$store.dispatch("fetchMovies")])
 
       var data = JSON.parse(JSON.stringify(this.$store.getters.getMovies))
-      // var favouritesData = JSON.parse(
-      //   JSON.stringify([]) //this.$store.getters.getFavourites
-      // )
       data.forEach((movie) => {
         if (!movie.favourites) movie.favourites = false
       })
@@ -262,27 +254,37 @@ export default {
       this.showLoading()
     },
     showLoading() {
-      // this.$q.loading.show();
-      // setTimeout(() => {
-      //   this.$q.loading.hide();
-      // }, 2000);
       this.$q.loadingBar.start()
-      // this.$q.loadingBar.stop();
-      // this.$q.loadingBar.increment(50);
     },
     async addAndRemoveFromFavourites(value) {
-      this.$store.commit("setSelectedMovie", value)
-      console.log(value, "favourites")
-      await this.$store.dispatch("editFavourites").then(async (res) => {
+      var token = this.$store.getters.getToken
+      if (!token) {
         this.$q.notify({
-          type: res.status && res.status == "success" ? "positive" : "negative",
-          message: res.message ? res.message : "Error Occured",
-          timeout: 2000,
+          type: "warning",
+          message: "Please login or register to add products to your cart",
+          timeout: 5000,
         })
-        if (res.status == "success") {
-          await this.getData()
-        }
-      })
+      } else {
+        this.$store.commit("setSelectedMovie", value)
+        await this.$store.dispatch("editFavourites").then(async (res) => {
+          this.$q.notify({
+            type:
+              res.status && res.status == "success" ? "positive" : "negative",
+            message: res.message ? res.message : "Error Occured",
+            timeout: 2000,
+          })
+          if (res.status == "success") {
+            await this.getData()
+          }
+        })
+      }
+    },
+    async searchTrailer() {
+      await Promise.all([
+        this.$store.commit("setSearchTrailer", this.searchText),
+        this.$store.dispatch("searchTrailer"),
+      ])
+      this.$router.push({ name: "Movies" })
     },
     viewTrailerClicked(value) {
       this.showMovieTrailer = true
@@ -291,19 +293,20 @@ export default {
       // this.$router.push({ name: "ViewTrailer" })
     },
     shareClicked(value) {
-      // this.showMovieTrailer = true
-      // this.selectedmovie = value
-      this.$store.commit("setSelectedMovie", value)
-      window.location.href =
-        "https://www.facebook.com/sharer/sharer.php?u=" + value.trailer
-    },
-    editMovieClicked(value) {
-      this.$store.commit("setSelectedMovie", value)
-      this.$router.push({ name: "MovieEdit" })
-    },
-    viewMoreClicked(value) {
-      this.$store.commit("setSelectedMovie", value)
-      this.$router.push({ name: "ViViewTrailerewMore" })
+      var token = this.$store.getters.getToken
+      if (!token) {
+        this.$q.notify({
+          type: "warning",
+          message: "Please login or register to add products to your cart",
+          timeout: 5000,
+        })
+      } else {
+        // this.showMovieTrailer = true
+        // this.selectedmovie = value
+        this.$store.commit("setSelectedMovie", value)
+        window.location.href =
+          "https://www.facebook.com/sharer/sharer.php?u=" + value.trailer
+      }
     },
   },
   computed: {

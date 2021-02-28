@@ -21,6 +21,8 @@ export default new Vuex.Store({
     favourite: [],
     selectedMovie: {},
     selectedFavourite: {},
+    searchTrailer: "",
+    moviesFound: [],
   },
   getters: {
     getUserId(state) {
@@ -43,6 +45,12 @@ export default new Vuex.Store({
     },
     getFavourites(state) {
       return state.favourite
+    },
+    getSearchTrailer(state) {
+      return state.searchTrailer
+    },
+    getSearchedMovie(state) {
+      return state.moviesFound
     },
   },
   mutations: {
@@ -71,6 +79,12 @@ export default new Vuex.Store({
     },
     setFavourites(state, value) {
       state.favourite = value
+    },
+    setSearchTrailer(state, value) {
+      state.searchTrailer = value
+    },
+    setSearchedMovie(state, value) {
+      state.moviesFound = value
     },
   },
   actions: {
@@ -109,20 +123,35 @@ export default new Vuex.Store({
     },
     async addMovies(context) {
       const movies = context.getters.getTrending
-      movies.forEach((movie) => {
+      const foundMovies = context.getters.getSearchedMovie
+      const allMovies = movies.concat(foundMovies)
+      allMovies.forEach((movie) => {
         movie.name = movie.original_title
         movie.year = movie.release_date
         movie.description = movie.overview
         movie.image = movie.poster_path
         movie.tmdb_id = movie.id
-        movie
       })
       await api()
-        .post(`movies/`, movies)
+        .post(`movies/`, allMovies)
         .then((res) => {
           if (res.data.status == "success") {
             var data = res.data.data.flat(1)
             context.commit("setMovies", data)
+          }
+        })
+        .catch((err) => console.log(err))
+    },
+    async searchTrailer(context) {
+      const searchText = context.getters.getSearchTrailer
+      await axios
+        .get(
+          `${process.env.VUE_APP_plain}query=${searchText}&page=1&include_adult=false`
+        )
+        .then((res) => {
+          if (res.status == 200) {
+            context.commit("setSearchedMovie", res.data.results)
+            return res.data
           }
         })
         .catch((err) => console.log(err))

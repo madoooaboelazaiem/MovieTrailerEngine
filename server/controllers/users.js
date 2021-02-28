@@ -26,7 +26,7 @@ const userSignup = async function (req, res) {
       const encrypted = bcrypt.genSaltSync(10)
       const hashedPassword = bcrypt.hashSync(req.body.password, encrypted)
       req.body.password = hashedPassword
-      const newUser = await UserModel.createUser(req.body)
+      const newUser = await UserModel.createNewUser(req.body)
       return res.status(200).send({
         status: "success",
         message: "User created successfully",

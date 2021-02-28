@@ -1,6 +1,18 @@
 <template>
   <q-page>
     <div class="row justify-center q-ma"></div>
+    <div
+      data-v-9d6b3f06=""
+      class="col justify-center"
+      style="
+    color: white;
+    text-align: center;
+    font-size: xx-large;
+    font-weight: bold;
+"
+    >
+      Whats Trending This Week ?
+    </div>
     <div class="row justify-center">
       <div class="col-xs-12 col-md-8">
         <div class="row">
@@ -170,18 +182,27 @@ export default {
       // this.$q.loadingBar.increment(50);
     },
     async addAndRemoveFromFavourites(value) {
-      this.$store.commit("setSelectedMovie", value)
-      console.log(value, "favourites")
-      await this.$store.dispatch("editFavourites").then(async (res) => {
+      var token = this.$store.getters.getToken
+      if (!token) {
         this.$q.notify({
-          type: res.status && res.status == "success" ? "positive" : "negative",
-          message: res.message ? res.message : "Error Occured",
-          timeout: 2000,
+          type: "warning",
+          message: "Please login or register to add products to your cart",
+          timeout: 5000,
         })
-        if (res.status == "success") {
-          await this.getData()
-        }
-      })
+      } else {
+        this.$store.commit("setSelectedMovie", value)
+        await this.$store.dispatch("editFavourites").then(async (res) => {
+          this.$q.notify({
+            type:
+              res.status && res.status == "success" ? "positive" : "negative",
+            message: res.message ? res.message : "Error Occured",
+            timeout: 2000,
+          })
+          if (res.status == "success") {
+            await this.getData()
+          }
+        })
+      }
     },
     viewTrailerClicked(value) {
       this.showMovieTrailer = true
@@ -190,11 +211,20 @@ export default {
       // this.$router.push({ name: "ViewTrailer" })
     },
     shareClicked(value) {
-      // this.showMovieTrailer = true
-      // this.selectedmovie = value
-      this.$store.commit("setSelectedMovie", value)
-      window.location.href =
-        "https://www.facebook.com/sharer/sharer.php?u=" + value.trailer
+      var token = this.$store.getters.getToken
+      if (!token) {
+        this.$q.notify({
+          type: "warning",
+          message: "Please login or register to add products to your cart",
+          timeout: 5000,
+        })
+      } else {
+        // this.showMovieTrailer = true
+        // this.selectedmovie = value
+        this.$store.commit("setSelectedMovie", value)
+        window.location.href =
+          "https://www.facebook.com/sharer/sharer.php?u=" + value.trailer
+      }
     },
   },
   created() {

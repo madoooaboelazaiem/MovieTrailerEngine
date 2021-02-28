@@ -124,7 +124,6 @@ export default {
     },
     async addAndRemoveFromFavourites(value) {
       this.$store.commit("setSelectedMovie", value)
-      console.log(value, "favourites")
       await this.$store.dispatch("editFavourites").then(async (res) => {
         this.$q.notify({
           type: res.status && res.status == "success" ? "positive" : "negative",

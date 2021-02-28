@@ -10,7 +10,6 @@
             @click="leftDrawerOpen = !leftDrawerOpen"
             aria-label="Menu"
             icon="fas fa-bars"
-            v-if="isAdmin"
           />
           <q-toolbar-title
             class="title-head"
@@ -38,54 +37,6 @@
             </q-tooltip>
           </q-btn>
           <q-btn
-            dense
-            color="none"
-            flat
-            round
-            icon="shopping_cart"
-            class="q-mr-xs"
-            v-if="!isAdmin"
-          >
-            <q-tooltip v-if="!$q.platform.is.mobile">
-              <span class="text-subtitle2">Cart</span>
-            </q-tooltip>
-            <q-badge color="red-8" floating v-if="currentCart.length > 0">{{
-              currentCart.length
-            }}</q-badge>
-            <q-menu>
-              <q-list style="min-width:200px">
-                <q-item v-for="(cartItem, index) in currentCart" :key="index">
-                  <q-item-section avatar>
-                    <q-avatar rounded>
-                      <img
-                        :src="
-                          cartItem.product.images
-                            ? cartItem.product.images[0].img
-                            : ''
-                        "
-                      />
-                    </q-avatar>
-                  </q-item-section>
-                  <q-item-section class="col-shrink"
-                    >{{ cartItem.count }} x
-                    {{ cartItem.product.name }}</q-item-section
-                  >
-                </q-item>
-                <q-separator />
-                <q-item v-if="currentCart.length > 0">
-                  <q-item-section>
-                    <q-btn
-                      dense
-                      class="bg-green-7 text-white"
-                      label="View Cart"
-                      @click="$router.push({ name: 'Cart' })"
-                    ></q-btn>
-                  </q-item-section>
-                </q-item>
-              </q-list>
-            </q-menu>
-          </q-btn>
-          <q-btn
             icon="account_circle"
             dense
             color="none"
@@ -107,24 +58,8 @@
                 </q-item>
                 <q-separator /> -->
                 <q-separator />
-                <q-item
-                  clickable
-                  v-close-popup
-                  v-if="!isAdmin"
-                  no-wrap
-                  @click="changeRoute('MyOrders')"
-                >
-                  <q-item-section>View My Orders</q-item-section>
-                </q-item>
+
                 <q-separator />
-                <q-item
-                  clickable
-                  v-close-popup
-                  v-if="!isAdmin"
-                  @click="changeRoute('Profile')"
-                >
-                  <q-item-section>My Profile</q-item-section>
-                </q-item>
               </q-list>
             </q-menu>
           </q-btn>
@@ -165,7 +100,7 @@
       bordered
       :breakpoint="700"
       elevated
-      content-class="bg-grey-2"
+      content-class="bg-grey-4"
       behavior="mobile"
     >
       <q-list>
@@ -228,9 +163,6 @@ export default {
     isLoggedIn() {
       return this.$store.getters.getToken
     },
-    currentCart() {
-      return this.$store.getters.getCart
-    },
   },
 }
 </script>
@@ -246,6 +178,7 @@ export default {
     cursor: pointer;
   }
 }
+
 .header-text {
   font-size: 16px;
   display: inline;
@@ -254,6 +187,7 @@ export default {
     color: rgb(209, 205, 205);
   }
 }
+
 .mouseHover {
   &:hover {
     cursor: pointer;
