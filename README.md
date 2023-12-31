@@ -1,6 +1,6 @@
 # MovieTrailerEngine
 
-this repo contains the tourism portal backend built with node, express and postgres and vuejs
+this repo contains the movie trailer engine backend built with node, express and postgres and vuejs
 
 ## Getting Started
 
